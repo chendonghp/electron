@@ -712,6 +712,36 @@ describe('chrome extensions', () => {
       expect(scope).equals(extension.url);
     });
 
+    describe('chrome.scripting', () => {
+      let customSession: Session;
+      let w = null as unknown as BrowserWindow;
+
+      before(async () => {
+        customSession = session.fromPartition(`persist:${uuid.v4()}`);
+      });
+
+      beforeEach(() => {
+        w = new BrowserWindow({
+          show: false,
+          webPreferences: {
+            session: customSession,
+            nodeIntegration: true
+          }
+        });
+      });
+
+      afterEach(closeAllWindows);
+
+      it('executeScript', async () => {
+        await customSession.loadExtension(path.join(fixtures, 'extensions', 'chrome-scripting', 'execute-script'));
+
+        w.loadURL(url);
+
+        const updated = await once(w.webContents, 'page-title-updated');
+        expect(updated[1]).to.equal('HEY HEY HEY');
+      });
+    });
+
     describe('chrome.tabs', () => {
       let customSession: Session;
       let w = null as unknown as BrowserWindow;

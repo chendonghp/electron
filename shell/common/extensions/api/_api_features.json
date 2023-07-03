@@ -41,5 +41,9 @@
     "matches": [
       "chrome://print/*"
     ]
-  }]
+  }],
+  "scripting": {
+    "dependencies": ["permission:scripting"],
+    "contexts": ["blessed_extension"]
+  }
 }

@@ -1,0 +1,14 @@
+{
+  "name": "execute-script",
+  "version": "1.0",
+  "permissions": [
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "manifest_version": 3
+}
