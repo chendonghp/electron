@@ -490,6 +490,114 @@
         }
       },
       {
+        "name": "query",
+        "type": "function",
+        "description": "Gets all tabs that have the specified properties, or all tabs if no properties are specified.",
+        "parameters": [
+          {
+            "type": "object",
+            "name": "queryInfo",
+            "properties": {
+              "active": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are active in their windows."
+              },
+              "pinned": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are pinned."
+              },
+              "audible": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are audible."
+              },
+              "muted": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are muted."
+              },
+              "highlighted": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are highlighted."
+              },
+              "discarded": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are discarded. A discarded tab is one whose content has been unloaded from memory, but is still visible in the tab strip. Its content is reloaded the next time it is activated."
+              },
+              "autoDiscardable": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs can be discarded automatically by the browser when resources are low."
+              },
+              "currentWindow": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are in the <a href='windows#current-window'>current window</a>."
+              },
+              "lastFocusedWindow": {
+                "type": "boolean",
+                "optional": true,
+                "description": "Whether the tabs are in the last focused window."
+              },
+              "title": {
+                "type": "string",
+                "optional": true,
+                "description": "Match page titles against a pattern. This property is ignored if the extension does not have the <code>\"tabs\"</code> permission."
+              },
+              "url": {
+                "choices": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ],
+                "optional": true,
+                "description": "Match tabs against one or more <a href='match_patterns'>URL patterns</a>. Fragment identifiers are not matched. This property is ignored if the extension does not have the <code>\"tabs\"</code> permission."
+              },
+              "groupId": {
+                "type": "integer",
+                "optional": true,
+                "minimum": -1,
+                "description": "The ID of the group that the tabs are in, or $(ref:tabGroups.TAB_GROUP_ID_NONE) for ungrouped tabs."
+              },
+              "windowId": {
+                "type": "integer",
+                "optional": true,
+                "minimum": -2,
+                "description": "The ID of the parent window, or $(ref:windows.WINDOW_ID_CURRENT) for the <a href='windows#current-window'>current window</a>."
+              },
+              "index": {
+                "type": "integer",
+                "optional": true,
+                "minimum": 0,
+                "description": "The position of the tabs within their windows."
+              }
+            }
+          }
+        ],
+        "returns_async": {
+          "name": "callback",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "array",
+              "items": {
+                "$ref": "Tab"
+              }
+            }
+          ]
+        }
+      },
+      {
         "name": "update",
         "type": "function",
         "description": "Modifies the properties of a tab. Properties that are not specified in <var>updateProperties</var> are not modified.",
@@ -565,6 +673,90 @@
       }
     ],
     "events": [
+      // Electron does not support tabs.create, so this event will never be fired,
+      // but we have this here to prevent it from causing undefined errors.
+      {
+        "name": "onCreated",
+        "type": "function",
+        "description": "Fired when a tab is created. Note that the tab's URL and tab group membership may not be set at the time this event is fired, but you can listen to onUpdated events so as to be notified when a URL is set or the tab is added to a tab group.",
+        "parameters": [
+          {
+            "$ref": "Tab",
+            "name": "tab",
+            "description": "Details of the tab that was created."
+          }
+        ]
+      },
+      {
+        "name": "onUpdated",
+        "type": "function",
+        "description": "Fired when a tab is updated.",
+        "parameters": [
+          {
+            "type": "integer",
+            "name": "tabId",
+            "minimum": 0
+          },
+          {
+            "type": "object",
+            "name": "changeInfo",
+            "description": "Lists the changes to the state of the tab that was updated.",
+            "properties": {
+              "url": {
+                "type": "string",
+                "optional": true,
+                "description": "The tab's URL if it has changed."
+              },
+              "groupId": {
+                "type": "integer",
+                "optional": true,
+                "minimum": -1,
+                "description": "The tab's new group."
+              },
+              "pinned": {
+                "type": "boolean",
+                "optional": true,
+                "description": "The tab's new pinned state."
+              },
+              "audible": {
+                "type": "boolean",
+                "optional": true,
+                "description": "The tab's new audible state."
+              },
+              "discarded": {
+                "type": "boolean",
+                "optional": true,
+                "description": "The tab's new discarded state."
+              },
+              "autoDiscardable": {
+                "type": "boolean",
+                "optional": true,
+                "description": "The tab's new auto-discardable state."
+              },
+              "mutedInfo": {
+                "$ref": "MutedInfo",
+                "optional": true,
+                "description": "The tab's new muted state and the reason for the change."
+              },
+              "favIconUrl": {
+                "type": "string",
+                "optional": true,
+                "description": "The tab's new favicon URL."
+              },
+              "title": {
+                "type": "string",
+                "optional": true,
+                "description": "The tab's new title."
+              }
+            }
+          },
+          {
+            "$ref": "Tab",
+            "name": "tab",
+            "description": "Gives the state of the tab that was updated."
+          }
+        ]
+      },
       {
         "name": "onZoomChange",
         "type": "function",
