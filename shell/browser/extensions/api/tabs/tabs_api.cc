@@ -259,11 +259,6 @@ ExtensionFunction::ResponseAction TabsQueryFunction::Run() {
 
     auto* wc = contents->web_contents();
 
-    // Match webContents title.
-    if (!title.empty() &&
-        !base::MatchPattern(wc->GetTitle(), base::UTF8ToUTF16(title)))
-      continue;
-
     // Match webContents audible value.
     if (!MatchesBool(audible, wc->IsCurrentlyAudible()))
       continue;
@@ -276,9 +271,26 @@ ExtensionFunction::ResponseAction TabsQueryFunction::Run() {
     if (!MatchesBool(params->query_info.active, contents->IsFocused()))
       continue;
 
-    // Match webContents url.
-    if (!url_patterns.is_empty() && !url_patterns.MatchesURL(wc->GetURL()))
-      continue;
+    if (!title.empty() || !url_patterns.is_empty()) {
+      // "title" and "url" properties are considered privileged data and can
+      // only be checked if the extension has the "tabs" permission or it has
+      // access to the WebContents's origin. Otherwise, this tab is considered
+      // not matched.
+      if (!extension()->permissions_data()->HasAPIPermissionForTab(
+              contents->ID(), mojom::APIPermissionID::kTab) &&
+          !extension()->permissions_data()->HasHostPermission(wc->GetURL())) {
+        continue;
+      }
+
+      // Match webContents title.
+      if (!title.empty() &&
+          !base::MatchPattern(wc->GetTitle(), base::UTF8ToUTF16(title)))
+        continue;
+
+      // Match webContents url.
+      if (!url_patterns.is_empty() && !url_patterns.MatchesURL(wc->GetURL()))
+        continue;
+    }
 
     tabs::Tab tab;
     tab.id = contents->ID();
