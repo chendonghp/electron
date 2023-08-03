@@ -25,6 +25,37 @@ or later will be required to run Electron v27.0.0 and higher.
 
 The `ipcRenderer.sendTo()` API has been deprecated. It should be replaced by setting up a [`MessageChannel`](tutorial/message-ports.md#setting-up-a-messagechannel-between-two-renderers) between the renderers.
 
+## Planned Breaking API Changes (26.0)
+
+### Deprecated: `systemPreferences.{get,set}AppLevelAppearance`
+
+The `systemPreferences.getAppLevelAppearance` and `systemPreferences.setAppLevelAppearance`
+methods have been deprecated. Use the `nativeTheme` module instead.
+
+```js
+// Deprecated
+systemPreferences.getAppLevelAppearance()
+// Replace with
+nativeTheme.shouldUseDarkColors
+
+// Deprecated
+systemPreferences.setAppLevelAppearance('dark')
+// Replace with
+nativeTheme.themeSource = 'dark'
+```
+
+### Deprecated: `alternate-selected-control-text` value for `systemPreferences.getColor`
+
+The `alternate-selected-control-text` value for `systemPreferences.getColor`
+has been deprecated. Use `selected-content-background` instead.
+
+```js
+// Deprecated
+systemPreferences.getColor('alternate-selected-control-text')
+// Replace with
+systemPreferences.getColor('selected-content-background')
+```
+
 ## Planned Breaking API Changes (25.0)
 
 ### Deprecated: `protocol.{register,intercept}{Buffer,String,Stream,File,Http}Protocol`
